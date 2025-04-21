@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Upload and Share File</title>
+  </head>
+  <body>
+    <h2>Upload and Share File</h2>
+    <form id="uploadForm">
+      <input type="file" id="file" required />
+      <input type="email" id="email" placeholder="Recipient Email" required />
+      <button type="submit">Upload & Send</button>
+    </form>
+
+    <script>
+      document.getElementById("uploadForm").onsubmit = async function (e) {
+        e.preventDefault();
+        const file = document.getElementById("file").files[0];
+        const email = document.getElementById("email").value;
+
+        const reader = new FileReader();
+        reader.onload = async function () {
+          const base64 = reader.result.split(",")[1];
+          const body = {
+            fileName: file.name,
+            fileContent: base64,
+            recipientEmail: email,
+          };
+
+          const res = await fetch(
+            "https://t9a0lonx1j.execute-api.us-east-1.amazonaws.com/prod/upload",
+            {
+              method: "POST",
+              body: JSON.stringify(body),
+              headers: { "Content-Type": "application/json" },
+            }
+          );
+
+          const json = await res.json();
+          alert(json.message);
+        };
+        reader.readAsDataURL(file);
+      };
+    </script>
+  </body>
+</html>
